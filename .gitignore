@@ -1,0 +1,3 @@
+# prevent .env environment variable pushed to remote repo
+# .env usually contains sensitive information
+.env
