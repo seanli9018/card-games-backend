@@ -2,7 +2,7 @@
 # .env usually contains sensitive information
 .env
 # node modules
-/node_modules
+node_modules/
 # IDE related
 .DS_Store
 .vscode
