@@ -31,16 +31,24 @@ module.exports = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    // Compare provided password with the hashed password in the database
+    // Compare provided password with the hashed password in the database.
     const hashedPassword = await argon2.hash(password);
     const isMatch = await argon2.verify(hashedPassword, user[0].password);
     if (!isMatch) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
+    // Inactive or unverified user handling.
+    if (!user[0].is_active || !user[0].is_verified) {
+      return res.status(403).json({
+        error:
+          "User is inactive or unverified. Please verify your account or contact support.",
+      });
+    }
+
     // Generate a JWT
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user[0].id, email: user[0].email },
       process.env.JWT_SECRET, // Store JWT_SECRET in .env file
       { expiresIn: "24h" } // valid for 24 hrs.
     );
@@ -54,7 +62,15 @@ module.exports = async (req, res) => {
     });
 
     // response success message.
-    res.status(200).json({ message: "Login successful" });
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        username: user[0].username,
+        email: user[0].email,
+        role: user[0].role,
+        profile_picture: user[0].profile_picture,
+      },
+    });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err.message });
   }
