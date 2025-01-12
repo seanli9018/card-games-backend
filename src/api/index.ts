@@ -13,7 +13,6 @@ app.use(json());
 
 const corsOptions = {
   origin: ["http://localhost:3000", "https://card-games-ecru.vercel.app/"],
-  allowedHeaders: ["Content-Type", "Authorization"], // Add custom headers here
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
