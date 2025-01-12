@@ -12,7 +12,7 @@ app.use(json());
 // app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://card-games-ecru.vercel.app/"],
+  origin: ["http://localhost:3000", "https://card-games-ecru.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
