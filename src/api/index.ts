@@ -11,7 +11,12 @@ const app = express();
 app.use(json());
 // app.use(express.urlencoded({ extended: true }));
 
-app.use(cors());
+const corsOptions = {
+  origin: ["http://localhost:3000", "https://card-games-ecru.vercel.app/"],
+  allowedHeaders: ["Content-Type", "Authorization"], // Add custom headers here
+  methods: ["GET", "POST", "PUT", "DELETE"],
+};
+app.use(cors(corsOptions));
 
 // Global error handler middleware
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
