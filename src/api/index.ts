@@ -28,7 +28,10 @@ app.get("/", async (_req: Request, res: Response) => {
   res.status(200).json({ message: "API is working!" });
 });
 
-// Export to handle serverless function
+// Export to handle local
+// export default app;
+
+// Export to handle vercel serverless function
 export default (req: Request, res: Response) => {
   app(req, res);
 };
