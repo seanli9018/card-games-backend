@@ -1,4 +1,4 @@
 {
   "builds": [{ "src": "dist/api/index.ts", "use": "@vercel/node" }],
-  "routes": [{ "src": "/dist/(.*)", "dest": "dist/api/index.ts" }]
+  "routes": [{ "src": "/(.*)", "dest": "dist/api/index.ts" }]
 }
