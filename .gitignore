@@ -6,3 +6,5 @@ node_modules/
 # IDE related
 .DS_Store
 .vscode
+#dist
+dist/
