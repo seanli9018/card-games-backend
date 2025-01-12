@@ -1,11 +1,17 @@
-const supabase = require("../../lib/supabaseClient");
-const jwt = require("jsonwebtoken");
-const argon2 = require("argon2"); // Ensure storing hashed passwords in the database.
-const { emailValidator, passwordValidator } = require("../../util/validators");
+import type { Request, Response, NextFunction, Application } from "express";
+import supabase from "../../lib/supabaseClient";
+import argon2 from "argon2"; // Ensure storing hashed passwords in the database.
+import { signToken } from "../../lib/auth";
+import { emailValidator, passwordValidator } from "../../util/validators";
 
-module.exports = async (req, res) => {
+const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
+    res.status(405).json({ error: "Method Not Allowed" });
+    return;
   }
 
   const { email, password } = req.body;
@@ -15,9 +21,8 @@ module.exports = async (req, res) => {
 
   // Validate the input
   if (!isValidEmail || !isValidPassword) {
-    return res
-      .status(400)
-      .json({ error: "Valid email and password are required" });
+    res.status(400).json({ error: "Valid email and password are required" });
+    return;
   }
 
   try {
@@ -28,36 +33,35 @@ module.exports = async (req, res) => {
       .eq("email", email);
 
     if (error || !user) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      res.status(401).json({ error: "Invalid email or password" });
+      return;
     }
 
     // Compare provided password with the hashed password in the database.
     const hashedPassword = await argon2.hash(password);
     const isMatch = await argon2.verify(hashedPassword, user[0].password);
     if (!isMatch) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      res.status(401).json({ error: "Invalid email or password" });
+      return;
     }
 
     // Inactive or unverified user handling.
     if (!user[0].is_active || !user[0].is_verified) {
-      return res.status(403).json({
+      res.status(403).json({
         error:
           "User is inactive or unverified. Please verify your account or contact support.",
       });
+      return;
     }
 
     // Generate a JWT
-    const token = jwt.sign(
-      { id: user[0].id, email: user[0].email },
-      process.env.JWT_SECRET, // Store JWT_SECRET in .env file
-      { expiresIn: "24h" } // valid for 24 hrs.
-    );
+    const token = await signToken({ id: user[0].id, email: user[0].email });
 
     // set token to client side cookie.
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Use `secure: true` in production for HTTPS only
-      sameSite: "Strict", // Prevents CSRF
+      sameSite: "strict", // Prevents CSRF
       maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
     });
 
@@ -71,7 +75,9 @@ module.exports = async (req, res) => {
         profile_picture: user[0].profile_picture,
       },
     });
-  } catch (err) {
-    res.status(500).json({ error: "Server error", details: err.message });
+  } catch (err: any) {
+    next(err);
   }
 };
+
+export default login;

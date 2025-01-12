@@ -1,7 +1,7 @@
-const supabase = require("../../lib/supabaseClient");
+import { from } from "../../lib/supabaseClient";
 
 // create user
-module.exports = async (req, res) => {
+export default async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
@@ -14,9 +14,9 @@ module.exports = async (req, res) => {
   }
 
   // Insert into Supabase
-  const { data, error } = await supabase
-    .from("user")
-    .insert([{ email, username, password }]);
+  const { data, error } = await from("user").insert([
+    { email, username, password },
+  ]);
 
   if (error) {
     return res.status(500).json({ error: error.message });
