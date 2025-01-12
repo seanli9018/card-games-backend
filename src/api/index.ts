@@ -28,4 +28,7 @@ app.get("/", async (_req: Request, res: Response) => {
   res.status(200).json({ message: "API is working!" });
 });
 
-export default app; // Export the app to be used in other files
+// Export to handle serverless function
+export default (req: Request, res: Response) => {
+  app(req, res);
+};

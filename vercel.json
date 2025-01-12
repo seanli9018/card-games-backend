@@ -1,4 +1,5 @@
 {
-  "builds": [{ "src": "dist/api/index.ts", "use": "@vercel/node" }],
-  "routes": [{ "src": "/(.*)", "dest": "dist/api/index.ts" }]
+  "version": 2,
+  "builds": [{ "src": "src/api/index.ts", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "src/api/index.ts" }]
 }
