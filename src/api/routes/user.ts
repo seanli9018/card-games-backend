@@ -1,14 +1,12 @@
 import { Router } from "express";
 const router = Router();
-import { login } from "../../controllers/userController";
+import { login, create } from "../../controllers/userController";
 
 // Define routes for user
 // login
 router.post("/login", login);
 
 // register/create
-router.post("/create", (_req, res) => {
-  res.send("create a user");
-});
+router.post("/create", create);
 
 export default router;

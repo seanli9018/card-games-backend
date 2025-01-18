@@ -1,7 +1,7 @@
-import type { Request, Response, NextFunction, Application } from "express";
+import type { Request, Response, NextFunction } from "express";
 import supabase from "../../lib/supabaseClient";
 import argon2 from "argon2"; // Ensure storing hashed passwords in the database.
-import { signToken } from "../../lib/auth";
+import { signToken, setTokenToCookie } from "../../lib/auth";
 import { emailValidator, passwordValidator } from "../../util/validators";
 
 const login = async (
@@ -37,9 +37,8 @@ const login = async (
       return;
     }
 
-    // Compare provided password with the hashed password in the database.
-    const hashedPassword = await argon2.hash(password);
-    const isMatch = await argon2.verify(hashedPassword, user[0].password);
+    // Compare the hashed password stored in the database tp plain password.
+    const isMatch = await argon2.verify(user[0].password, password);
     if (!isMatch) {
       res.status(401).json({ error: "Invalid email or password" });
       return;
@@ -58,12 +57,7 @@ const login = async (
     const token = await signToken({ id: user[0].id, email: user[0].email });
 
     // set token to client side cookie.
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use `secure: true` in production for HTTPS only
-      sameSite: "strict", // Prevents CSRF
-      maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
-    });
+    setTokenToCookie(res, token);
 
     // response success message.
     res.status(200).json({

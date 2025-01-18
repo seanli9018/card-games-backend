@@ -1,4 +1,6 @@
+import type { Response } from "express";
 import { SignJWT, jwtVerify } from "jose";
+import { TOKEN_AGE } from "./constants";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
@@ -18,4 +20,13 @@ export async function verifyToken(token: string) {
   } catch (error) {
     return null;
   }
+}
+
+export async function setTokenToCookie(res: Response, token: string) {
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Use `secure: true` in production for HTTPS only
+    sameSite: "strict", // Prevents CSRF
+    maxAge: TOKEN_AGE, // 1 day expiration
+  });
 }

@@ -33,7 +33,7 @@ app.get("/", async (_req: Request, res: Response) => {
   res.status(200).json({ message: "API is working!" });
 });
 
-// Export to handle local
+// Enable below comment for local env
 // export default app;
 
 // Export to handle vercel serverless function
