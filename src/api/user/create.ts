@@ -47,7 +47,7 @@ const create = async (
   if (existingUser) {
     res.status(409).json({
       message: "Email already exists!",
-      user: {},
+      user: null,
     });
     return;
   }
