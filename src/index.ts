@@ -3,8 +3,11 @@ import express, {
   type Request,
   type Response,
   type NextFunction,
-} from "express";
-import cors from "cors";
+} from 'express';
+import http from 'http';
+import cors from 'cors';
+import { initializeSocket } from './socket/socket'; // Import socket logic
+
 const app = express();
 
 // Add middleware to parse JSON and URL-encoded data
@@ -12,8 +15,8 @@ app.use(json());
 // app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://card-games-ecru.vercel.app"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: ['http://localhost:3000', 'https://card-games-ecru.vercel.app'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -24,14 +27,19 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: err.message });
 });
 
-// user
-import userRoutes from "./routes/user";
-app.use("/user", userRoutes);
+// User
+import userRoutes from './api/routes/user';
+app.use('/user', userRoutes);
 
-// All your routes and middleware
-app.get("/", async (_req: Request, res: Response) => {
-  res.status(200).json({ message: "API is working!" });
+// All routes and middleware
+app.get('/', async (_req: Request, res: Response) => {
+  res.status(200).json({ message: 'API is working!' });
 });
+
+// Games: Create HTTP server
+const server = http.createServer(app);
+// Initialize socket.io
+initializeSocket(server);
 
 // Enable below comment for local env
 // export default app;

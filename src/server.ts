@@ -1,4 +1,4 @@
-import app from "./api";
+import app from '.';
 
 // Enable below comments for local env.
 // const port = process.env.PORT || 8000;
