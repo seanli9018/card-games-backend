@@ -1,4 +1,4 @@
-import app from '.';
+import app from './index';
 
 // Enable below comments for local env.
 // const port = process.env.PORT || 8000;
